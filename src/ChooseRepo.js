@@ -7,7 +7,6 @@ export default function ChooseRepo({onSwitchPage, handleChangeRepo}) {
 
     useEffect(() => {
         fetch('/repos').then(res => res.json()).then(data => {
-          // console.log(data.repo_names);
           setRepos(data.repo_names);
         });
       }, []);
@@ -16,7 +15,7 @@ export default function ChooseRepo({onSwitchPage, handleChangeRepo}) {
         setInputValue(event.target.value);
     };
 
-    const handleButtonClick = () => {
+    const handleSubmitRepo = () => {
 
         // URL of the API endpoint
         const apiUrl = '/newrepo'
@@ -55,7 +54,7 @@ export default function ChooseRepo({onSwitchPage, handleChangeRepo}) {
             onChange={handleRepoInput}
             placeholder="Enter repo url here"
             />
-            <button onClick={handleButtonClick}>Submit</button>
+            <button onClick={handleSubmitRepo}>Submit</button>
             </div>
             <div>
             <p className="choose-repo-item">Or choose from an existing repo</p>
