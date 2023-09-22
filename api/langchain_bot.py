@@ -15,6 +15,7 @@ persist_directory = './db'
 
 
 def get_github_files(repo_owner, repo_name):
+    print(repo_owner)
     with tempfile.TemporaryDirectory() as d:
         subprocess.check_call(
             f"git clone --depth 1 https://github.com/{repo_owner}/{repo_name}.git .",
@@ -30,6 +31,7 @@ def get_github_files(repo_owner, repo_name):
         repo_path = pathlib.Path(d)
 
         files = [x for x in list(repo_path.glob('**/*')) if x.is_file()]
+        print(len(files))
         for file in files:
             with open(file, "r", errors='ignore') as f:
                 relative_path = file.relative_to(repo_path)
@@ -38,12 +40,14 @@ def get_github_files(repo_owner, repo_name):
 
 
 def chunk_docs(sources):
-    print('start chunk docs')
     # could try different source_splitter
     text_splitter = CharacterTextSplitter(chunk_size=1000, chunk_overlap=0)
-    source_chunks = text_splitter.split_documents(sources)
-    return source_chunks
-
+    try:
+        source_chunks = text_splitter.split_documents(sources)
+        return source_chunks
+    except Exception:
+        raise
+        
 
 def index_docs(source_chunks, embeddings, repo_owner, repo_name):
     collection_name = repo_owner+"-"+repo_name
@@ -72,12 +76,15 @@ def construct_convo_chain(retriever):
 
 def add_new_repo(repo_owner, repo_name):
     sources = get_github_files(repo_owner, repo_name)
-    source_chunks = chunk_docs(sources)
-    db = index_docs(source_chunks, embeddings, repo_owner, repo_name)
-    # does it need to construct receiver and chain now?
-    retriever = construct_retriever(db)
-    qa = construct_convo_chain(retriever)
-    return qa
+    try:
+        source_chunks = chunk_docs(sources)
+        db = index_docs(source_chunks, embeddings, repo_owner, repo_name)
+        # does it need to construct receiver and chain now?
+        retriever = construct_retriever(db)
+        qa = construct_convo_chain(retriever)
+        return qa
+    except Exception:
+        raise
 
 
 def get_collection_names():

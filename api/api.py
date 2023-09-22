@@ -1,4 +1,4 @@
-from flask import Flask, request, redirect, url_for
+from flask import Flask, request, redirect, url_for, abort
 import time
 import langchain_bot
 from urllib.parse import urlparse
@@ -21,10 +21,15 @@ def input_repo():
     url = parse_json['url']
     path = urlparse(url).path
     path_split = path.split('/')
+    if len(path_split) < 3:
+        abort(400)
     repo_owner = path_split[1]
     repo_name = path_split[2]
-    langchain_bot.add_new_repo(repo_owner, repo_name)
-    return redirect(url_for('qa'))
+    try:
+        langchain_bot.add_new_repo(repo_owner, repo_name)
+        return {'response': 'success'}
+    except Exception:
+        abort(400)
 
 
 @app.route('/qa')

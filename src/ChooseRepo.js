@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import Button from 'react-bootstrap/Button';
 
 export default function ChooseRepo({onSwitchPage, handleChangeRepo}) {
     const [inputValue, setInputValue] = useState('');
@@ -38,8 +37,11 @@ export default function ChooseRepo({onSwitchPage, handleChangeRepo}) {
         fetch(apiUrl, requestOptions).then(response => response.json()).then(data => {
             console.log('Response data:', data);
         }).catch(error => {
-            console.error('Error:', error);
+            setInputValue('make sure to enter a valid GitHub URL')
         });
+
+
+        setInputValue('')
 
       };
 
@@ -47,7 +49,7 @@ export default function ChooseRepo({onSwitchPage, handleChangeRepo}) {
     return (
         <div>
             <div>
-            <p className="choose-repo-item">Submit a new repo below</p>
+            <p className="choose-repo-item">Copy and paste GitHub URL directly</p>
             <input
             type="text"
             value={inputValue}
